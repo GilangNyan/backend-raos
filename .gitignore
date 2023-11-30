@@ -17,3 +17,4 @@ benchmarks/graphs
 # Ignored by Projects
 dist
 .env
+logs
