@@ -3,18 +3,20 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-export async function databaseConnection(): Promise<void> {
-    const db = process.env.DB_NAME || 'db_raos'
-    const user = process.env.DB_USER || 'postgres'
-    const password = process.env.DB_PASSWORD || ''
+const db = process.env.DB_NAME || 'db_raos'
+const user = process.env.DB_USER || 'postgres'
+const password = process.env.DB_PASSWORD || ''
 
-    const sequelize = new Sequelize(db, user, password, {
-        host: process.env.DB_HOST,
-        dialect: 'postgres'
-    })
+export const sequelize = new Sequelize(db, user, password, {
+    host: process.env.DB_HOST,
+    dialect: 'postgres'
+})
+
+export async function testConnection(): Promise<void> {
+    const _sequelize = sequelize
 
     try {
-        await sequelize.authenticate()
+        await _sequelize.authenticate()
         console.log("Database terkoneksi!")
     } catch (error) {
         console.log("Database belum terkoneksi:", error)

@@ -1,7 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { databaseConnection } from './config/database'
+import { sequelize, testConnection } from './config/database'
+import { routes } from './routes'
+import bodyParser from 'body-parser'
 
 dotenv.config()
 
@@ -10,11 +12,17 @@ const StartServer = async () => {
     const app = express()
     const port = process.env.PORT || 3000
 
-    await databaseConnection()
+    await testConnection()
 
-    app.use(express.json())
-    app.use(express.urlencoded({extended: true}))
+    app.use(bodyParser.json({ limit: '50mb', type: 'application/json' }))
+    app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
     app.use(cors())
+
+    // Routes
+    app.use('/', routes)
+
+    // Sync Database
+    sequelize.sync()
 
     app.listen(port, () => {
         console.log(`Server berjalan di port ${port}`)
