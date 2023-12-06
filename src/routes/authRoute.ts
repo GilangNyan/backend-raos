@@ -1,8 +1,10 @@
 import express from 'express'
-import { registerUser } from '../controllers/userController'
+import { loginUser, registerUser } from '../controllers/userController'
+import { generateToken } from '../middlewares/authentication'
 
 const authRoute = express.Router()
 
-authRoute.post('/user', registerUser)
+authRoute.post('/register', registerUser)
+authRoute.post('/login', loginUser, generateToken)
 
 export default authRoute

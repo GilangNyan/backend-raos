@@ -46,13 +46,21 @@ User.init(
             allowNull: false,
             unique: true,
             validate: {
-                isNumeric: true
+                isNumeric: true,
+                len: [10, 13]
             }
+        },
+        profileImage: {
+            type: DataTypes.STRING,
+        },
+        roleId: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: false
         }
     },
     {
         sequelize,
-        modelName: 'User'
+        modelName: 'user'
     }
 )
 

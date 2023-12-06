@@ -13,10 +13,8 @@ export const sequelize = new Sequelize(db, user, password, {
 })
 
 export async function testConnection(): Promise<void> {
-    const _sequelize = sequelize
-
     try {
-        await _sequelize.authenticate()
+        await sequelize.authenticate()
         console.log("Database terkoneksi!")
     } catch (error) {
         console.log("Database belum terkoneksi:", error)

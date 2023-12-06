@@ -19,7 +19,7 @@ const StartServer = async () => {
     app.use(cors())
 
     // Routes
-    app.use('/', routes)
+    app.use('/api/', routes)
 
     // Sync Database
     sequelize.sync()
