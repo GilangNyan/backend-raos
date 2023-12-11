@@ -1,10 +1,10 @@
 import express from 'express'
-import { loginUser, registerUser } from '../controllers/userController'
-import { generateToken } from '../middlewares/authentication'
+import { loginUser, registerUser } from '../controllers/authController'
+import { checkLogin } from '../middlewares/authentication'
 
 const authRoute = express.Router()
 
 authRoute.post('/register', registerUser)
-authRoute.post('/login', loginUser, generateToken)
+authRoute.post('/login', checkLogin, loginUser)
 
 export default authRoute
