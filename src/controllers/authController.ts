@@ -1,7 +1,10 @@
 import * as argon2 from "argon2";
 import { NextFunction, Request, Response, response } from "express";
+import * as jwt from "jsonwebtoken";
 import User from "../models/userModel";
 import { errorResponse, failResponse, successResponse } from "../utils/response";
+import { hash } from "../utils/crypt";
+import Config from "../models/configModel";
 
 export const registerUser = async (req: Request, res: Response) => {
     const {
@@ -49,28 +52,29 @@ export const registerUser = async (req: Request, res: Response) => {
     })
 }
 
-export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
-    const {
-        username,
-        password
-    } =  req.body
-
-    await User.findOne({
-        where: {
-            username: username
-        }
-    }).then(async result => {
-        if (Object.keys(result!).length == 0) {
-            return res.status(404).send(failResponse(result))
-        } else {
-            let userPassword = result!.dataValues.password
-            let verify = await argon2.verify(userPassword, password)
-            if (verify) {
-                req.body = result
-                return next()
+export const loginUser = async (req: Request, res: Response) => {
+    const secretKey:string = process.env.SECRET_KEY!
+    try {
+        // Ambil waktu expire token
+        let expireTime = await Config.findOne({
+            where: {
+                key: 'jwtExpirationTime'
             }
+        })
+        let expireMinute = expireTime?.dataValues.value.toString() + 'm'
+        // Buat Token dan Refresh Token
+        let refreshId = req.body.dataValues.id + secretKey
+        let hashRefresh = hash(refreshId)
+        req.body.dataValues.refreshKey = hashRefresh.split('$')[0]
+        let token = jwt.sign(req.body.dataValues, secretKey, {expiresIn: expireMinute})
+        let b = Buffer.from(hashRefresh.split('$')[1])
+        let refreshToken = b.toString('base64')
+        let accessToken = {
+            accessToken: token,
+            refreshToken: refreshToken
         }
-    }).catch(error => {
-        return res.status(500).send(errorResponse(error))
-    })
+        return res.status(200).send(successResponse(accessToken))
+    } catch (error) {
+        return res.status(500).send(errorResponse('error jwt'))
+    }
 }
