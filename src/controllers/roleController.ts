@@ -3,8 +3,11 @@ import Role from "../models/roleModel";
 import { errorResponse, failResponse, successResponse } from "../utils/response";
 
 export const getRole = async (req: Request, res: Response) => {
-    const {pages, perPage} = req.body
-    await Role.findAndCountAll().then(result => {
+    const {page, perPage} = req.body
+    await Role.findAndCountAll({
+        offset: (page - 1) * perPage,
+        limit: perPage
+    }).then(result => {
         return res.status(200).send(successResponse(result))
     }).catch(error => {
         return res.status(500).send(errorResponse(error))
@@ -17,7 +20,7 @@ export const createRole = async (req: Request, res: Response) => {
     await Role.create({
         name: name
     }).then(result => {
-        return res.status(201).json(successResponse(result))
+        return res.status(201).send(successResponse(result))
     }).catch(error => {
         if (error.name == 'SequelizeValidationError') {
             return res.status(400).send(failResponse(error))
