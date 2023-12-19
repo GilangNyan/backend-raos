@@ -61,7 +61,7 @@ export const loginUser = async (req: Request, res: Response) => {
                 key: 'jwtExpirationTime'
             }
         })
-        let expireMinute = expireTime?.dataValues.value.toString() + 'm'
+        let expireMinute = expireTime?.dataValues.value + 'm'
         // Buat Token dan Refresh Token
         let refreshId = req.body.dataValues.id + secretKey
         let hashRefresh = hash(refreshId)
